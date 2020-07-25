@@ -1,22 +1,20 @@
 const express = require('express');
 const router = express.Router();
 const _ = require('lodash');
-const async = require('async');
 const path = require('path');
 
 const fileUpload = require('../services/fileUpload');
 const db = require('../startup/db');
-const { result } = require('lodash');
 
 
 // Create profile
 router.post('/new', (req, res) => {
     try {
         let reqBody = req.body;
-        db.run('CREATE TABLE IF NOT EXISTS profile(id INTEGER PRIMARY KEY AUTOINCREMENT,name TEXT,email TEXT, password TEXT, address TEXT, dog_breed TEXT, dog_gender TEXT, dog_age TEXT, dog_pic TEXT)');
+        db.run('CREATE TABLE IF NOT EXISTS profile(id INTEGER PRIMARY KEY AUTOINCREMENT,name TEXT,email TEXT, password TEXT, address TEXT, dog_name TEXT, dog_breed TEXT, dog_gender TEXT, dog_age TEXT, dog_pic TEXT)');
 
-        let sql = `INSERT INTO profile(name) VALUES(?,?)`;
-        db.run('INSERT INTO profile(name, email, password, address, dog_breed dog_gender, dog_age, dog_pic) VALUES(?,?,?,?,?,?)', [reqBody.name, reqBody.email, reqBody.password, reqBody.address, reqBody.dog_breed, reqBody.dog_gender, reqBody.dog_age, reqBody.dog_pic], (err) => {
+        // let sql = `INSERT INTO profile(name) VALUES(?,?)`;
+        db.run('INSERT INTO profile(name, email, password, address, dog_name, dog_breed dog_gender, dog_age, dog_pic) VALUES(?,?,?,?,?,?,?,?,?)', [reqBody.name, reqBody.email, reqBody.password, reqBody.address, reqBody.dog_name, reqBody.dog_breed, reqBody.dog_gender, reqBody.dog_age, reqBody.dog_pic], (err) => {
             if (err) {
                 return console.log(err.message);
             }
@@ -28,7 +26,6 @@ router.post('/new', (req, res) => {
     }
 });
 
-// ${req.body.email}
 // login
 router.post('/login', (req, res) => {
     try {
@@ -65,7 +62,6 @@ router.get('/all', (req, res) => {
             if (err) {
                 throw err;
             }
-            // console.log(rows)
             _.remove(rows, (row) => {
                 if (row.dog_gender) {
                     return row.dog_gender.toLowerCase() == req.query.gender.toLowerCase();
@@ -76,6 +72,7 @@ router.get('/all', (req, res) => {
                 console.log(row)
                 obj.id = row.id;
                 obj.name = row.name;
+                obj.dog_name = row.dog_name;
                 obj.email = row.email;
                 obj.dog_gender = row.dog_gender;
                 obj.address = row.address;
@@ -159,8 +156,8 @@ router.post('/uploadPic', (req, res) => {
             if (!req.file) {
                 return res.status(400).json({ success: false, msg: "No file passed", errors: err });
             }
-            // let rootPath = path.join(__dirname, '../uploads/');
-            res.status(200).sendFile(req.file.path)
+            let rootPath = path.join(__dirname, '../uploads/', req.file.filename);
+            res.status(200).send(rootPath)
         })
     }
     catch (e) {
