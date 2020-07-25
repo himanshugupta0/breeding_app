@@ -1,0 +1,11 @@
+node_modules/
+tests/
+config/database.js
+uploads/*
+optimization-output/*
+!uploads/.gitkeep
+imageUploads/*
+files/*
+.DS_Store
+.vscode
+package-lock.json
