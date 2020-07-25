@@ -45,7 +45,8 @@ router.post('/login', (req, res) => {
                 if (isUserExists.password != req.body.password) {
                     return res.status(401).json('Email or password is incorrect...')
                 } else {
-                    res.status(200).json('Success')
+                    delete isUserExists.password;
+                    res.status(200).send(isUserExists)
                 }
             }
         });
